@@ -1,0 +1,82 @@
+.flyout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  .flyout-panel {
+    position: fixed;
+    top: 0;
+    left: -300px; /* hidden by default */
+    width: 280px;
+    height: 100%;
+    background-color: var(--ctp-mantle);
+    color: var(--ctp-text);
+    transition: left 0.3s ease;
+    z-index: 1001;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+  }
+  
+  .flyout-panel.open {
+    left: 0;
+  }
+  
+  .flyout-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+  
+  .flyout-message {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--ctp-subtext0);
+    text-align: center;
+  }
+  
+  .flyout-login-btn {
+    background-color: var(--ctp-mauve);
+    color: var(--ctp-crust);
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 1rem;
+    width: 100%;
+  }
+  
+  .flyout-login-btn:hover {
+    background-color: var(--ctp-pink);
+  }
+  
+  .flyout-help-icon {
+    position: absolute;
+    bottom: 1rem;
+    right: 0;
+  }
+  
+  .flyout-help-icon button {
+    background-color: var(--ctp-surface0);
+    color: var(--ctp-text);
+    border: 1px solid var(--ctp-surface1);
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .flyout-help-icon button:hover {
+    background-color: var(--ctp-surface1);
+  }

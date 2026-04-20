@@ -1,0 +1,23 @@
+Change Log
+
+Feature A: Home Page (Landing Page).
+Feature B: Account Creation.
+Feature C: Log-In. 
+Feature D: Log-Out. 
+(Iteration 1)
+
+Feature E: Chat with LLM. (Implemented in #5 and merged into main branch -Mar 24, 2026)
+
+Feature F: Save Conversation History. (Implemented in #6 and merged into main branch - Mar 26,2026)
+Feature F1: Collapsible Chat History Sections(Implemented in #7 and merged into main branch - Apr.1.2026)
+
+Feature G: Search Conversation History. (Implemented in #7and merged into main branch - Apr.1,2026)
+UI Feature added:  New Chat + search box 
+Backend: search API for improved accuracy 
+Fixed duplicate message issue during conversation initialization
+
+Feature G1: Flyout Panel Interaction Enhancements (main - Apr.4.2026)
+Added hover interaction for conversation items
+Implemented scrollable chat history panel
+
+Feature H: Continue Conversation. Updates in #7 (Apr.2.2026)

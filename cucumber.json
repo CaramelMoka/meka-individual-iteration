@@ -1,0 +1,11 @@
+{
+  "default": {
+    "require": [
+      "step_definitions/*.cjs",
+      "support/*.cjs"
+    ],
+    "format": ["progress"],
+    "paths": ["features/"],
+    "publishQuiet": true
+  }
+}

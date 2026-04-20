@@ -1,0 +1,24 @@
+.app-header {
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--ctp-mantle);
+    color: var(--ctp-text);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--ctp-mauve);
+}
+
+nav a {
+    margin-left: 1rem;
+    color: var(--ctp-blue);
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: var(--ctp-sapphire);
+}
