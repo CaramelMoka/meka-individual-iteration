@@ -6,6 +6,7 @@ import PromptInput from '../components/PromptInput';
 import AIOutput from '../components/AIOutput';
 import FlyoutPanel from '../components/FlyoutPanel';
 import AuthModal from '../components/AuthModal';
+import ModelSelector from '../components/ModelSelector';
 import './Landing.css';
 
 
@@ -20,7 +21,13 @@ const Landing = () => {
   const [refreshHistory, setRefreshHistory] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const [selectedModels, setSelectedModels] = useState(['gemma3:270m']);
+  // eslint-disable-next-line no-unused-vars
+  const [models, setModels] = useState([
+  { id: 'gemma3:270m', name: 'Gemma', showInSelector: true },
+  { id: 'smollm2:135m', name: 'SmolLM', showInSelector: true },
+  { id: 'tinyllama', name: 'TinyLlama', showInSelector: true }
+]);
   
 
   // Restore session on page load
@@ -65,8 +72,8 @@ useEffect(() => {
   };
 
   loadHistory();
-
-}, [isLoggedIn, username]); // ❗移除 refreshHistory
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isLoggedIn, username]); //  refreshHistory
 
 
 
@@ -107,6 +114,7 @@ useEffect(() => {
     try {
       const body = {
         prompt,
+        models: selectedModels,
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
       };
@@ -118,7 +126,15 @@ useEffect(() => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'LLM failed');
 
-      setMessages(prev => [...prev, { role: 'ai', content: data.response }]);
+const newMessages = data.responses.map(r => ({
+  role: r.model,
+  content: r.response
+}));
+
+setMessages(prev => [
+  ...prev,
+  ...newMessages
+]);
       if (isLoggedIn && data.conversationId && !conversationId) {
         setConversationId(data.conversationId);
       }
@@ -157,7 +173,12 @@ useEffect(() => {
         </div>
         <div className="top-center">
           <Greeting username={username} />
+
           <PromptInput onSend={handleSend} loading={loading} error={error} />
+         <ModelSelector
+          models={models}
+          selectedModels={selectedModels}
+          setSelectedModels={setSelectedModels}/>
         </div>
         <div className="top-right">
           <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
