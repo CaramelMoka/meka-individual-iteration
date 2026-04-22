@@ -69,7 +69,7 @@ app.post('/api/login', (req, res) => {
 
 //chat end point
 app.post('/api/chat', async (req, res) => {
-  const { prompt, username, conversationId, messages } = req.body;
+  const { prompt, models, username, conversationId, messages } = req.body;
 
   if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
@@ -105,22 +105,36 @@ app.post('/api/chat', async (req, res) => {
     }
 
 //waitfor ai
-    const response = await callLLM(prompt);
+  const modelList = models && models.length > 0 ? models : ['gemma3:270m'];
+const responses = [];
+for (const m of modelList) {
+  const r = await callLLM(prompt, m);
+  responses.push(r);
+}
 //save ai messave
-    if (username) {
-      await new Promise((resolve, reject) => {
-        db.run(
-          `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
-          [currentConversationId, 'ai', response],
-          (err) => (err ? reject(err) : resolve())
-        );
-      });
-    }
-
-    return res.json({
-      response,
-      conversationId: currentConversationId
+if (username) {
+  for (let i = 0; i < responses.length; i++) {
+    await new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?)`,
+        [
+          currentConversationId,
+          modelList[i],
+          responses[i]
+        ],
+        (err) => (err ? reject(err) : resolve())
+      );
     });
+  }
+}
+
+return res.json({
+   responses: responses.map((r, i) => ({
+    model: modelList[i],
+    response: r
+  })),
+  conversationId: currentConversationId
+});
 
   } catch (err) {
     console.error(err);
