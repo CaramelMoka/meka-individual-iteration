@@ -53,3 +53,12 @@ These stories deliver a basic interface with a landing page and user authenticat
 Total effort: 2+2+2+2+1+2 = 11 points.   
 These stories allow users to interact with the LLM and manage their conversation history.
 
+### Identifies Stories for Iteration(Individual)  
+| #  | User Story                                                                                                                 | Function                  | Points |
+| -- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- | ------ |
+| I1 | As a user, I want to select multiple LLMs, so that I can query them simultaneously | Model Selection | 2 |
+| I2 | As a user, I want to view responses from multiple LLMs side-by-side, so that I can compare their outputs | Multi-LLM Response Display | 3 |
+| J1 | As a user, I want to access a panel to manage available models, so that I can configure which models I use | Manage Models Panel | 2 |
+| J2 | As a user, I want to enable or disable models, so that only selected models appear in the main interface | Enable/Disable Models | 2 |
+| J3 | As a user, I want to add a custom model by specifying its endpoint, so that I can use my own local or external models | Add Custom Model | 3 |
+| J4 | As a user, I want model configuration changes to be saved automatically, so that I do not need to manually save settings | Auto-Save Configuration | 1 |
