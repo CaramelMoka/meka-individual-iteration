@@ -3,8 +3,7 @@ import React from 'react';
 const ModelManagementPanel = ({
   models,
   setModels,
-  //selectedModels,
-  //setSelectedModels
+  setSelectedModels
 }) => {
 
   const toggleVisibility = (id) => {

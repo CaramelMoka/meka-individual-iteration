@@ -199,7 +199,6 @@ setMessages(prev => [
     <ModelManagementPanel
       models={models}
       setModels={setModels}
-      selectedModels={selectedModels}
       setSelectedModels={setSelectedModels}
     />
   )}
