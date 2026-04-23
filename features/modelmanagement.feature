@@ -9,3 +9,8 @@ Feature: Model Management
     Given the model management panel is loaded with "Model A" selected
     When I toggle "Model A"
     Then "Model A" should be removed from selected models
+
+  Scenario: User can add a custom model (J3)
+  Given the model management panel is loaded
+  When I add a custom model "MyModel" with endpoint "http://localhost:9999"
+  Then the custom model should be added

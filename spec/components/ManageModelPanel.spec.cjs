@@ -76,4 +76,38 @@ describe('ModelManagementPanel', () => {
     expect(selected).toEqual([]);
   });
 
+  it('adds a custom model with endpoint (J3)', () => {
+  let models = [];
+
+  const setModels = (fn) => {
+    models = fn(models);
+  };
+
+  render(
+    <ModelManagementPanel
+      models={models}
+      setModels={setModels}
+      selectedModels={[]}
+      setSelectedModels={() => {}}
+    />
+  );
+
+  fireEvent.click(screen.getByText('+ Add custom model'));
+  fireEvent.change(screen.getByPlaceholderText('Model name'), {
+    target: { value: 'MyModel' }
+  });
+
+  fireEvent.change(screen.getByPlaceholderText('Endpoint (http://...)'), {
+    target: { value: 'http://localhost:9999' }
+  });
+
+
+  fireEvent.click(screen.getByText('Add'));
+
+  expect(models.length).toBe(1);
+  expect(models[0].name).toBe('MyModel');
+  expect(models[0].endpoint).toBe('http://localhost:9999');
+  expect(models[0].showInSelector).toBe(true);
+});
+
 });

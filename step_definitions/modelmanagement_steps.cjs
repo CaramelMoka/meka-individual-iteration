@@ -33,14 +33,31 @@ Given('the model management panel is loaded with {string} selected', function (m
 When('I toggle {string}', function (modelName) {
   const model = models.find(m => m.name === modelName);
 
-  // 模拟 toggleVisibility
   model.showInSelector = !model.showInSelector;
 
-  // 同步删除 selected
   selectedModels = selectedModels.filter(id => id !== model.id);
 });
 
 Then('{string} should be removed from selected models', function (modelName) {
   const model = models.find(m => m.name === modelName);
   assert(!selectedModels.includes(model.id));
+});
+
+//J3
+When('I add a custom model {string} with endpoint {string}', function (name, endpoint) {
+  const newModel = {
+    id: name.toLowerCase().replace(/\s+/g, '-'),
+    name: name,
+    endpoint: endpoint,
+    showInSelector: true
+  };
+
+  models.push(newModel);
+});
+Then('the custom model should be added', function () {
+  const model = models.find(m => m.name === 'MyModel');
+
+  assert(model !== undefined);
+  assert(model.endpoint === 'http://localhost:9999');
+  assert(model.showInSelector === true);
 });
