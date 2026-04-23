@@ -116,6 +116,7 @@ useEffect(() => {
       const body = {
         prompt,
         models: selectedModels,
+        modelConfigs: models, 
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
       };

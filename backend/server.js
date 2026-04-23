@@ -67,9 +67,11 @@ app.post('/api/login', (req, res) => {
   );
 });
 
+
+
 //chat end point
 app.post('/api/chat', async (req, res) => {
-  const { prompt, models, username, conversationId, messages } = req.body;
+  const { prompt, models, modelConfigs, username, conversationId, messages } = req.body;
 
   if (!prompt&& (!messages || messages.length === 0)) {
     return res.status(400).json({ error: 'Prompt is required' });
@@ -77,6 +79,8 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     let currentConversationId = conversationId || null;
+
+
 //create conversation
     if (username && !currentConversationId) {
       const title = prompt || "New Chat";
@@ -105,10 +109,17 @@ app.post('/api/chat', async (req, res) => {
     }
 
 //waitfor ai
-  const modelList = models && models.length > 0 ? models : ['gemma3:270m'];
+const modelList = models && models.length > 0 ? models : ['gemma3:270m'];
+
 const responses = [];
 for (const m of modelList) {
-  const r = await callLLM(prompt, m);
+  const modelObj =
+    modelConfigs.find(x => x.id === m) || {
+      id: m,
+      endpoint: 'http://localhost:11434'
+  };
+
+  const r = await callLLM(prompt, modelObj);
   responses.push(r);
 }
 //save ai messave
