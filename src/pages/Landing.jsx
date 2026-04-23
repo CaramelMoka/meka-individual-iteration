@@ -22,10 +22,6 @@ const Landing = () => {
   const [refreshHistory, setRefreshHistory] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-<<<<<<< HEAD
-  // eslint-disable-next-line no-unused-vars
-=======
->>>>>>> 85efc3d (Add Cucumber BDD tests for model management (J1, J2))
   const [selectedModels, setSelectedModels] = useState(['gemma3:270m']);
   const [models, setModels] = useState([
   { id: 'gemma3:270m', name: 'Gemma', showInSelector: true },
