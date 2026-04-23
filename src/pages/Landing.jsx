@@ -22,6 +22,7 @@ const Landing = () => {
   const [refreshHistory, setRefreshHistory] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [selectedModels, setSelectedModels] = useState(['gemma3:270m']);
   const [models, setModels] = useState([
   { id: 'gemma3:270m', name: 'Gemma', showInSelector: true },
