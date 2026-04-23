@@ -7,6 +7,7 @@ import AIOutput from '../components/AIOutput';
 import FlyoutPanel from '../components/FlyoutPanel';
 import AuthModal from '../components/AuthModal';
 import ModelSelector from '../components/ModelSelector';
+import ModelManagementPanel from '../components/ModelManagementPanel';
 import './Landing.css';
 
 
@@ -28,6 +29,7 @@ const Landing = () => {
   { id: 'smollm2:135m', name: 'SmolLM', showInSelector: true },
   { id: 'tinyllama', name: 'TinyLlama', showInSelector: true }
 ]);
+  const [isModelPanelOpen, setIsModelPanelOpen] = useState(false);
   
 
   // Restore session on page load
@@ -168,17 +170,42 @@ setMessages(prev => [
       />
       <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} onLoginSuccess={handleLoginSuccess} />
       <header className="top-bar">
+        
         <div className="top-left">
           <HamburgerMenu onClick={toggleFlyout} />
         </div>
+
+
+
         <div className="top-center">
           <Greeting username={username} />
 
           <PromptInput onSend={handleSend} loading={loading} error={error} />
-         <ModelSelector
-          models={models}
-          selectedModels={selectedModels}
-          setSelectedModels={setSelectedModels}/>
+<div className="model-row">
+
+  <button
+    className="model-toggle-btn"
+    onClick={() => setIsModelPanelOpen(prev => !prev)}
+  >
+    {isModelPanelOpen ? '>' : '<'}
+  </button>
+
+  <ModelSelector
+    models={models}
+    selectedModels={selectedModels}
+    setSelectedModels={setSelectedModels}
+  />
+
+  {isModelPanelOpen && (
+    <ModelManagementPanel
+      models={models}
+      setModels={setModels}
+      selectedModels={selectedModels}
+      setSelectedModels={setSelectedModels}
+    />
+  )}
+
+</div>
         </div>
         <div className="top-right">
           <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
