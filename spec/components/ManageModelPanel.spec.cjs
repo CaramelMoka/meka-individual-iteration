@@ -45,7 +45,7 @@ describe('ModelManagementPanel', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
 
     expect(setModels).toHaveBeenCalled();
     expect(setSelectedModels).toHaveBeenCalled();
@@ -71,16 +71,58 @@ describe('ModelManagementPanel', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
 
     expect(selected).toEqual([]);
   });
 
   it('adds a custom model with endpoint (J3)', () => {
-  let models = [];
+    let models = [];
 
-  const setModels = (fn) => {
-    models = fn(models);
+    const setModels = (updated) => {
+      models = updated;
+    };
+
+    render(
+      <ModelManagementPanel
+        models={models}
+        setModels={setModels}
+        selectedModels={[]}
+        setSelectedModels={() => {}}
+      />
+    );
+
+    fireEvent.click(screen.getByText('+ Add custom model'));
+
+    fireEvent.change(screen.getByPlaceholderText('Model name'), {
+      target: { value: 'MyModel' }
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('Endpoint (http://...)'), {
+      target: { value: 'http://localhost:9999' }
+    });
+
+    fireEvent.click(screen.getByText('Add'));
+
+    expect(models.length).toBe(1);
+    expect(models[0].name).toBe('MyModel');
+    expect(models[0].endpoint).toBe('http://localhost:9999');
+    expect(models[0].showInSelector).toBe(true);
+  });
+
+  it('deletes a custom model', () => {
+  let models = [
+    {
+      id: '1',
+      name: 'MyModel',
+      endpoint: 'http://localhost',
+      showInSelector: true,
+      isCustom: true
+    }
+  ];
+
+  const setModels = (updated) => {
+    models = updated;
   };
 
   render(
@@ -92,22 +134,9 @@ describe('ModelManagementPanel', () => {
     />
   );
 
-  fireEvent.click(screen.getByText('+ Add custom model'));
-  fireEvent.change(screen.getByPlaceholderText('Model name'), {
-    target: { value: 'MyModel' }
-  });
+  fireEvent.click(screen.getByText('✕'));
 
-  fireEvent.change(screen.getByPlaceholderText('Endpoint (http://...)'), {
-    target: { value: 'http://localhost:9999' }
-  });
-
-
-  fireEvent.click(screen.getByText('Add'));
-
-  expect(models.length).toBe(1);
-  expect(models[0].name).toBe('MyModel');
-  expect(models[0].endpoint).toBe('http://localhost:9999');
-  expect(models[0].showInSelector).toBe(true);
+  expect(models.length).toBe(0);
 });
 
 });

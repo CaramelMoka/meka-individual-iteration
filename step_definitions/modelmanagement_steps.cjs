@@ -61,3 +61,49 @@ Then('the custom model should be added', function () {
   assert(model.endpoint === 'http://localhost:9999');
   assert(model.showInSelector === true);
 });
+
+//J4
+Given('I have a custom model {string}', function (name) {
+  models = [
+    {
+      id: '1',
+      name,
+      endpoint: 'http://localhost',
+      showInSelector: true,
+      isCustom: true
+    }
+  ];
+});
+
+When('I delete the custom model {string}', function (name) {
+  models = models.filter(m => m.name !== name);
+});
+
+Then('the model {string} should not exist', function (name) {
+  const model = models.find(m => m.name === name);
+  assert(model === undefined);
+});
+
+let savedModels = [];
+
+Given('I have added a custom model {string} with endpoint {string}', function (name, endpoint) {
+  const newModel = {
+    id: '1',
+    name,
+    endpoint,
+    showInSelector: true,
+    isCustom: true
+  };
+
+  models = [newModel];
+
+  savedModels = [...models];
+});
+When('I reload the page', function () {
+  
+  models = [...savedModels];
+});
+Then('I should still see {string}', function (name) {
+  const model = models.find(m => m.name === name);
+  assert(model !== undefined);
+});

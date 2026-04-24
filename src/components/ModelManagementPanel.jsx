@@ -171,6 +171,8 @@ const deleteBtnStyle = {
   <div key={model.id} style={rowStyle}>
     <div style={leftGroup}>
       <div
+       role="checkbox"
+       aria-checked={model.showInSelector}
         style={{
           ...checkboxStyle,
           backgroundColor: model.showInSelector
@@ -203,6 +205,8 @@ const deleteBtnStyle = {
   <div key={model.id} style={rowStyle}>
     <div style={leftGroup}>
       <div
+       role="checkbox"
+        aria-checked={model.showInSelector}
         style={{
           ...checkboxStyle,
           backgroundColor: model.showInSelector
