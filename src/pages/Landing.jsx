@@ -79,6 +79,41 @@ useEffect(() => {
 
 
 
+useEffect(() => {
+  if (!isLoggedIn || !username) return;
+
+  const loadModels = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/api/getModels?username=${username}`
+      );
+      const data = await res.json();
+
+      if (!Array.isArray(data)) return;
+
+      const customModels = data.map(m => ({
+        id: String(m.id),
+        name: m.name,
+        endpoint: m.endpoint,
+        showInSelector: true,
+        isCustom: true
+      }));
+
+      // append custom
+      setModels(prev => [
+        ...prev.filter(m => !m.isCustom), 
+        ...customModels                   
+      ]);
+
+    } catch (err) {
+      console.error('Failed to load models', err);
+    }
+  };
+
+  loadModels();
+}, [isLoggedIn, username]);
+
+
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
   const openAuthModal = () => setIsAuthModalOpen(true);

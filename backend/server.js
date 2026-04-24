@@ -5,6 +5,7 @@ import db from './database.js';
 import ollama from 'ollama';
 import { callLLM } from './llm.js';
 
+
 const app = express();
 app.use(cors()); 
 app.use(express.json());
@@ -66,6 +67,67 @@ app.post('/api/login', (req, res) => {
     }
   );
 });
+
+
+
+//save models in 
+app.post('/api/saveModels', (req, res) => {
+  const { username, models } = req.body;
+
+  if (!username) {
+    return res.status(400).json({ error: 'No username' });
+  }
+
+  db.run(`DELETE FROM user_models WHERE username = ?`, [username], (err) => {
+    if (err) return res.status(500).json(err);
+
+  const stmt = db.prepare(`
+    INSERT INTO user_models (username, name, endpoint)
+    VALUES (?, ?, ?)
+  `);
+
+    models.forEach(m => {
+    if (!m.name) return;
+     stmt.run(
+     username,
+     m.name,
+     m.endpoint ?? "",
+    (err) => {if (err) console.error("Insert model failed:", err.message, m);}
+    );
+    });
+
+    stmt.finalize();
+
+    res.json({ success: true });
+  });
+});
+
+app.get('/api/getModels', (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({ error: 'No username' });
+  }
+
+  db.all(
+    `SELECT * FROM user_models WHERE username = ?`,
+    [username],
+    (err, rows) => {
+      if (err) return res.status(500).json(err);
+
+      const models = rows.map(r => ({
+        id: r.id,
+        name: r.name,
+        endpoint: r.endpoint || undefined
+      }));
+
+      res.json(models);
+    }
+  );
+});
+
+
+
 
 
 
@@ -271,6 +333,7 @@ app.get('/api/conversation/:id', (req, res) => {
 app.listen(3001, () => {
   console.log('Auth server running on port 3001');
 });
+
 
 
 export default app;

@@ -9,38 +9,99 @@ const ModelManagementPanel = ({
   const [newEndpoint, setNewEndpoint] = useState('');
   const [showForm, setShowForm] = useState(false);
 
-  const toggleVisibility = (id) => {
-    setModels(prev =>
-      prev.map(m =>
-        m.id === id
-          ? { ...m, showInSelector: !m.showInSelector }
-          : m
-      )
-    );
+const toggleVisibility = async (id) => {
+  let updated;
 
-    setSelectedModels(prev =>
-      prev.filter(mid => mid !== id)
+  setModels(prev => {
+    updated = prev.map(m =>
+      m.id === id
+        ? { ...m, showInSelector: !m.showInSelector }
+        : m
     );
-  };
-  const addCustomModel = () => {
+    return updated;
+  });
+
+  setSelectedModels(prev => prev.filter(mid => mid !== id));
+
+  try {
+    await fetch('http://localhost:3001/api/saveModels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: localStorage.getItem('username'),
+        models: updated.filter(m => m.isCustom)
+      })
+    });
+  } catch (err) {
+    console.error('Toggle save failed:', err);
+  }
+};
+
+
+
+//CustomModel
+  const addCustomModel = async () => {
   if (!newName || !newEndpoint) return;
 
   const newModel = {
-    id: newName.toLowerCase().replace(/\s+/g, '-'),
+    id: Date.now().toString(),
     name: newName,
     endpoint: newEndpoint,
-    showInSelector: true
+    showInSelector: true,
+    isCustom: true
   };
 
-  setModels(prev => [...prev, newModel]);
 
+  const updatedModels = [...models, newModel];
+//render Ui
+  setModels(updatedModels);
+  try {//send to backend
+   const customModels = updatedModels.filter(m => m.isCustom);
+    await fetch('http://localhost:3001/api/saveModels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: localStorage.getItem('username'),
+        models: customModels
+      })
+    });
+
+  } catch (err) {
+    console.error('Failed to save models:', err);
+  }
+//clear form
   setNewName('');
   setNewEndpoint('');
 };
 
-  //
-const defaultModels = models.filter(m => !m.endpoint);
-const customModels = models.filter(m => m.endpoint);
+const deleteCustomModel = async (id) => {
+  const updated = models.filter(m => m.id !== id);
+//renderUI
+  setModels(updated);
+  setSelectedModels(prev => prev.filter(mid => mid !== id));
+
+  try {
+    const customModels = updated.filter(m => m.isCustom);
+
+    await fetch('http://localhost:3001/api/saveModels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: localStorage.getItem('username'),
+        models: customModels
+      })
+    });
+  } catch (err) {
+    console.error('Delete failed:', err);
+  }
+};
+
+  
+
+ const defaultModels = models.filter(m => !m.isCustom);
+ const customModels = models.filter(m => m.isCustom);
+
+ //style
 const inputStyle = {
   width: '100%',
   padding: '6px 8px',
@@ -57,30 +118,79 @@ const btnStyle = {
   borderRadius: '6px',
   border: 'none',
   background: '#cba6f7',
-  color: 'white',
+  color: 'rgb(55, 9, 65)',
   cursor: 'pointer'
+};
+const rowStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '6px 8px',
+ 
+};
+
+const leftGroup = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px'
+};
+
+const checkboxStyle = {
+  appearance: 'none',
+  WebkitAppearance: 'none',
+  width: '16px',
+  height: '16px',
+  cursor: 'pointer',
+  border: '1.5px solid var(--ctp-mauve)',
+  backgroundColor: 'var(--ctp-surface0)',
+  borderRadius: '4px',
+  position: 'relative'
+};
+
+const deleteBtnStyle = {
+  marginLeft: '6px',
+  background: 'transparent',
+  border: 'none',
+  color: '#e3e3e3',
+  cursor: 'pointer',
+  fontSize: '0.9rem',
+  opacity: 0.8
 };
 
   return (
     <div className="model-panel">
       <h3>Models</h3>
 
-      {/* ⭐ Default */}
+      {/*  Default */}
       <div>
         <div style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '6px' }}>
           Available
         </div>
 
         {defaultModels.map(model => (
-          <div key={model.id} className="model-row-item">
-            <span>{model.name}</span>
-            <input
-              type="checkbox"
-              checked={model.showInSelector}
-              onChange={() => toggleVisibility(model.id)}
-            />
-          </div>
-        ))}
+  <div key={model.id} style={rowStyle}>
+    <div style={leftGroup}>
+      <div
+        style={{
+          ...checkboxStyle,
+          backgroundColor: model.showInSelector
+            ? 'var(--ctp-mauve)'
+            : 'var(--ctp-surface0)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgb(55, 9, 65)',
+          fontSize: '12px'
+        }}
+        onClick={() => toggleVisibility(model.id)}
+      >
+        {model.showInSelector ? '✓' : ''}
+      </div>
+
+      <span>{model.name}</span>
+    </div>
+  </div>
+))}
       </div>
 
       {/*  Custom */}
@@ -89,16 +199,37 @@ const btnStyle = {
           Custom
         </div>
 
-        {customModels.map(model => (
-          <div key={model.id} className="model-row-item">
-            <span>{model.name}</span>
-            <input
-              type="checkbox"
-              checked={model.showInSelector}
-              onChange={() => toggleVisibility(model.id)}
-            />
-          </div>
-        ))}
+{customModels.map(model => (
+  <div key={model.id} style={rowStyle}>
+    <div style={leftGroup}>
+      <div
+        style={{
+          ...checkboxStyle,
+          backgroundColor: model.showInSelector
+            ? 'var(--ctp-mauve)'
+            : 'var(--ctp-surface0)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgb(55, 9, 65)',
+          fontSize: '12px'
+        }}
+        onClick={() => toggleVisibility(model.id)}
+      >
+        {model.showInSelector ? '✓' : ''}
+      </div>
+
+      <span>{model.name}</span>
+    </div>
+
+    <button
+      onClick={() => deleteCustomModel(model.id)}
+      style={deleteBtnStyle}
+    >
+      ✕
+    </button>
+  </div>
+))}
 
 <div style={{ marginTop: '8px' }}>
   {!showForm && (
@@ -131,7 +262,7 @@ const btnStyle = {
         style={inputStyle}
       />
 
-      <div style={{ display: 'flex', gap: '6px' }}>
+      <div style={{ display: 'flex', gap: '6px',marginTop: '12px' }}>
         <button style={btnStyle} onClick={() => {
           addCustomModel();
           setShowForm(false);
