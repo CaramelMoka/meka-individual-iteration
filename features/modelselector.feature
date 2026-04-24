@@ -21,3 +21,14 @@ Feature: Model Selection
     Given a model has showInSelector set to false
     When the ModelSelector is rendered
     Then the hidden model should not appear
+
+  
+  Scenario: Delete a custom model
+    Given I have a custom model "MyModel"
+    When I delete the custom model "MyModel"
+    Then the model "MyModel" should not exist
+
+  Scenario: Custom models persist after reload
+    Given I have added a custom model "MyModel" with endpoint "http://localhost:9999"
+    When I reload the page
+    Then I should still see "MyModel"

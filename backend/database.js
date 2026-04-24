@@ -60,4 +60,20 @@ db.serialize(() => {
   });
 });
 
+//model record
+db.run(`
+  CREATE TABLE IF NOT EXISTS user_models (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    name TEXT NOT NULL,
+    endpoint TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`, (err) => {
+  if (err) console.error('Error creating user_models table:', err.message);
+  else console.log('User models table ready');
+});
+
+
+
 export default db;

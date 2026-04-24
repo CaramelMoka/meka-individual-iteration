@@ -7,6 +7,7 @@ import AIOutput from '../components/AIOutput';
 import FlyoutPanel from '../components/FlyoutPanel';
 import AuthModal from '../components/AuthModal';
 import ModelSelector from '../components/ModelSelector';
+import ModelManagementPanel from '../components/ModelManagementPanel';
 import './Landing.css';
 
 
@@ -22,12 +23,12 @@ const Landing = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedModels, setSelectedModels] = useState(['gemma3:270m']);
-  // eslint-disable-next-line no-unused-vars
   const [models, setModels] = useState([
   { id: 'gemma3:270m', name: 'Gemma', showInSelector: true },
   { id: 'smollm2:135m', name: 'SmolLM', showInSelector: true },
   { id: 'tinyllama', name: 'TinyLlama', showInSelector: true }
 ]);
+  const [isModelPanelOpen, setIsModelPanelOpen] = useState(false);
   
 
   // Restore session on page load
@@ -78,6 +79,41 @@ useEffect(() => {
 
 
 
+useEffect(() => {
+  if (!isLoggedIn || !username) return;
+
+  const loadModels = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/api/getModels?username=${username}`
+      );
+      const data = await res.json();
+
+      if (!Array.isArray(data)) return;
+
+      const customModels = data.map(m => ({
+        id: String(m.id),
+        name: m.name,
+        endpoint: m.endpoint,
+        showInSelector: true,
+        isCustom: true
+      }));
+
+      // append custom
+      setModels(prev => [
+        ...prev.filter(m => !m.isCustom), 
+        ...customModels                   
+      ]);
+
+    } catch (err) {
+      console.error('Failed to load models', err);
+    }
+  };
+
+  loadModels();
+}, [isLoggedIn, username]);
+
+
 
   const toggleFlyout = () => setIsFlyoutOpen(!isFlyoutOpen);
   const openAuthModal = () => setIsAuthModalOpen(true);
@@ -115,6 +151,7 @@ useEffect(() => {
       const body = {
         prompt,
         models: selectedModels,
+        modelConfigs: models, 
         username: isLoggedIn ? username : null,
         conversationId: isLoggedIn ? conversationId : null,
       };
@@ -168,17 +205,41 @@ setMessages(prev => [
       />
       <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} onLoginSuccess={handleLoginSuccess} />
       <header className="top-bar">
+        
         <div className="top-left">
           <HamburgerMenu onClick={toggleFlyout} />
         </div>
+
+
+
         <div className="top-center">
           <Greeting username={username} />
 
           <PromptInput onSend={handleSend} loading={loading} error={error} />
-         <ModelSelector
-          models={models}
-          selectedModels={selectedModels}
-          setSelectedModels={setSelectedModels}/>
+<div className="model-row">
+
+  <button
+    className="model-toggle-btn"
+    onClick={() => setIsModelPanelOpen(prev => !prev)}
+  >
+    {isModelPanelOpen ? '>' : '<'}
+  </button>
+
+  <ModelSelector
+    models={models}
+    selectedModels={selectedModels}
+    setSelectedModels={setSelectedModels}
+  />
+
+  {isModelPanelOpen && (
+    <ModelManagementPanel
+      models={models}
+      setModels={setModels}
+      setSelectedModels={setSelectedModels}
+    />
+  )}
+
+</div>
         </div>
         <div className="top-right">
           <AccountIcon onLoginClick={openAuthModal} onLogout={handleLogout} isLoggedIn={isLoggedIn} />
